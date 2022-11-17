@@ -2,7 +2,6 @@ const { Pool } = require('pg');
 
 const params = process.argv;
 const cohort = params[2];
-const limit = params[3];
 
 const pool = new Pool({
   user: 'vagrant',
@@ -12,11 +11,13 @@ const pool = new Pool({
 });
 
 pool.query(`
-SELECT students.id, students.name as name, cohorts.name as cohort
-FROM students
-JOIN cohorts on students.cohort_id = cohorts.id
-WHERE cohorts.name like '${cohort}%'
-LIMIT ${limit};
+SELECT DISTINCT teachers.name as teacher, cohorts.name as cohort
+FROM teachers
+JOIN assistance_requests ON teacher_id = teachers.id
+JOIN students ON student_id = students.id
+JOIN cohorts ON cohort_id = cohorts.id
+WHERE cohorts.name like '%${cohort}%'
+ORDER BY teacher;
 `)
 .then(res => {
   console.log(res.rows);
