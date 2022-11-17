@@ -11,13 +11,15 @@ const pool = new Pool({
   database: 'bootcampx'
 });
 
+const values = [`%${cohort}%`, limit];
+
 pool.query(`
 SELECT students.id, students.name as name, cohorts.name as cohort
 FROM students
 JOIN cohorts on students.cohort_id = cohorts.id
-WHERE cohorts.name like '${cohort}%'
-LIMIT ${limit};
-`)
+WHERE cohorts.name like $1
+LIMIT $2;
+`, values)
 .then(res => {
   console.log(res.rows);
 })
